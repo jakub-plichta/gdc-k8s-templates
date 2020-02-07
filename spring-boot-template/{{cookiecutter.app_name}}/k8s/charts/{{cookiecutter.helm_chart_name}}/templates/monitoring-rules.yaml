@@ -89,15 +89,15 @@ data:
           summary: "{{`{{ $labels.deployment }}`}} has not enough replicas"
           runbook: "https://confluence.intgdc.com/display/plat/Generic+runbooks#Genericrunbooks-Criticalnumberofreplicas"{% endraw %}
       - alert: "[{{cookiecutter.app_name.replace('-', ' ').title()}}] Container is being throttled on cluster={% raw %}{{ .Values.clusterId }}{% endraw %}"
-        expr: rate(container_cpu_cfs_throttled_seconds_total{namespace="{% raw %}{{ .Release.Namespace }{% endraw %}}", container_name=~".+", pod_name=~'^{% raw %}{{{% endraw %} include "{{cookiecutter.helm_chart_name}}.fullname" . {% raw %}}}{% endraw %}.*'}[1m]) > 1
+        expr: rate(container_cpu_cfs_throttled_seconds_total{namespace="{% raw %}{{ .Release.Namespace }{% endraw %}}", container=~".+", pod=~'^{% raw %}{{{% endraw %} include "{{cookiecutter.helm_chart_name}}.fullname" . {% raw %}}}{% endraw %}.*'}[1m]) > 1
         for: 5m
         labels:
           severity: critical
           team: {{cookiecutter.team}}
           cluster_id: {% raw %}{{ .Values.clusterId }}{% endraw %}
         annotations: {% raw %}
-          description: "{{`{{ $labels.pod_name }}`}} container is beeing throttled and probably hit CPU limit. Investigate root cause and increase limit and/or number of replicas if necessary."
-          summary: "{{`{{ $labels.pod_name }}`}} Container is being throttled"
+          description: "{{`{{ $labels.pod }}`}} container is beeing throttled and probably hit CPU limit. Investigate root cause and increase limit and/or number of replicas if necessary."
+          summary: "{{`{{ $labels.pod }}`}} Container is being throttled"
           runbook: "https://confluence.intgdc.com/display/plat/Generic+runbooks#Genericrunbooks-Containerisbeingthrottled"{% endraw %}
       - alert: "[{{cookiecutter.app_name.replace('-', ' ').title()}}] is doing too much pause GC on cluster={% raw %}{{ .Values.clusterId }}{% endraw %}"
         expr: rate(jvm_gc_pause_seconds_sum{kubernetes_namespace='{% raw %}{{ .Release.Namespace }}{% endraw %}', kubernetes_pod_name=~'^{% raw %}{{{% endraw %} include "{{cookiecutter.helm_chart_name}}.fullname" . {% raw %}}}{% endraw %}.*'}[1m]) > 1
